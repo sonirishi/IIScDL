@@ -17,14 +17,33 @@ from sklearn.decomposition import PCA
 
 ### Q2 Implementation of scaler and whitening
 
+class normalise:
+    def __init__(self,technique = 'standardise'):
+        self.technique = technique.lower()
+    
+    def fit(self,matrix):
+        if self.technique == 'standardise':
+            self.mean = mean(matrix,axis=0)
+            self.std = std(matrix,axis=0)
+            self.output = (matrix - self.mean)/self.std
+            return self.output, self.mean, self.std
+        elif self.technique == 'whiten':
+            self.mean = mean(matrix,axis=0)
+            self.std = std(matrix,axis=0)            
+            self.data_cov = cov(matrix,rowvar=False)
+            self.evals, self.evecs = eigh(self.data_cov)
+            demean_random = matrix - self.mean
+            self.whiten_random = matmul(demean_random,self.evecs.T)/sqrt(self.evals)
+            return self.whiten_random, self.data_cov
+        else:
+            print('Technique not implemented')
+
 avg = [3, 4]
 covr = [[2, 1.5], [1.5, 2.5]]  # diagonal covariance
 random_data = multivariate_normal(avg, covr, 100)
 
-x_mean = mean(random_data,axis=0)
-x_std = std(random_data,axis=0)
-
-scale_random = (random_data - x_mean)/x_std
+scl_ri = normalise(technique='standardise')
+scale_random, datamean, datastd = scl_ri.fit(random_data)
 
 sns.scatterplot(x=scale_random[:,0],y=scale_random[:,1])
 plt.xlabel("X")
@@ -44,13 +63,8 @@ plt.title('Scaled Data')
 
 ## Covariance matrix and eigendecomposition #####
 
-data_cov = cov(random_data,rowvar=False)
-
-evals, evecs = eigh(data_cov)
-
-demean_random = random_data - x_mean
-
-whiten_random = matmul(demean_random,evecs.T)/sqrt(evals)
+whiten_ri = normalise(technique='whiten')
+whiten_random, cov_matrix = whiten_ri.fit(random_data)
 
 sns.scatterplot(x=whiten_random[:,0],y=whiten_random[:,1])
 plt.xlabel("X")
