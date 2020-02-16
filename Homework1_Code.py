@@ -15,6 +15,9 @@ from numpy import identity, transpose, matmul, triu, diag, zeros, absolute, cov,
 column_stack, mean, std, sqrt
 from sklearn.decomposition import PCA
 
+print(pd.__version__)
+print(sns.__version__)
+
 ### Q2 Implementation of scaler and whitening
 
 class normalise:
@@ -74,7 +77,6 @@ plt.title('Whiten Data')
 ## Compare with PCA O/P ##
 
 pca = PCA(n_components=2)
-pca.fit(scale_random)
 scale_random_pca = pca.fit_transform(scale_random)
 
 sns.scatterplot(x=scale_random_pca[:,0],y=scale_random_pca[:,1])
@@ -151,7 +153,6 @@ plt.title('Self Implemeted PCA Features with Class')
 ### Test using actual PCA implementation in scikit-learn
 
 pca = PCA(n_components=2)
-pca.fit(X)
 X_pca_sklearn = pca.fit_transform(X)
 
 pca_data_sklearn = column_stack((X_pca_sklearn,y))
