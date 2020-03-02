@@ -83,27 +83,25 @@ class LogisticRegression():
         self.out = self._softmax(out)
         return self.out
     
-# =============================================================================
-#     def backward(self,input_tensor,output_tensor):
-#         self.grad_weight = torch.zeros(self.input_dim,self.output_dim)
-#         self.grad_bias = torch.zeros(self.output_dim)
-#         self.deviance = (self.out - output_tensor)
-#         for i in range(self.output_dim):
-#             self.grad_weight[:,i] = \
-#             torch.sum(input_tensor.t()*self.deviance[:,i],dim=1)/len(input_tensor)
-#             self.grad_bias[i] = torch.sum(self.deviance[:,i])/len(input_tensor)
-# =============================================================================
-            
     def backward(self,input_tensor,output_tensor):
         self.grad_weight = torch.zeros(self.input_dim,self.output_dim)
         self.grad_bias = torch.zeros(self.output_dim)
         self.deviance = (self.out - output_tensor)
         for i in range(self.output_dim):
-            for j in range(len(input_tensor)):
-                self.grad_weight[:,i] += self.deviance[j,i]*input_tensor[j,]
-                self.grad_bias[i] += self.deviance[j,i]
-        self.grad_weight = self.grad_weight/len(input_tensor)
-        self.grad_bias = self.grad_bias/len(input_tensor)
+            self.grad_weight[:,i] = \
+            torch.sum(input_tensor.t()*self.deviance[:,i],dim=1)/len(input_tensor)
+            self.grad_bias[i] = torch.sum(self.deviance[:,i])/len(input_tensor)
+            
+#    def backward(self,input_tensor,output_tensor):
+#        self.grad_weight = torch.zeros(self.input_dim,self.output_dim)
+#        self.grad_bias = torch.zeros(self.output_dim)
+#        self.deviance = (self.out - output_tensor)
+#        for i in range(self.output_dim):
+#            for j in range(len(input_tensor)):
+#                self.grad_weight[:,i] += self.deviance[j,i]*input_tensor[j,]
+#                self.grad_bias[i] += self.deviance[j,i]
+#        self.grad_weight = self.grad_weight/len(input_tensor)
+#        self.grad_bias = self.grad_bias/len(input_tensor)
                      
     def sgd(self,learning_rate):
         self.weight = self.weight - learning_rate*self.grad_weight
