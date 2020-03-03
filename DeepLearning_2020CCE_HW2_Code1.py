@@ -16,6 +16,7 @@ from math import sqrt
 import matplotlib.pyplot as plt
 from itertools import product
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 
 torch.manual_seed(1988)
 
@@ -152,8 +153,8 @@ epochs = 15
 
 counter = 0
 
-learn_rate_lst = list([0.001, 0.01, 0.05, 0.1])
-batch_size_lst = list([1,32, 128, 1024])
+learn_rate_lst = list([0.1])
+batch_size_lst = list([128, 1024])
 
 splitsize = 50000
 
@@ -181,14 +182,20 @@ for lr, batchsize in grid_hyperparam:
     test_acc_store[counter,1] = batchsize
     test_loss_store[counter,2] = lt
     test_acc_store[counter,2] = at
-            
-    counter += 1
+    
     print("Iteration {} Done".format(counter))
+                
+    counter += 1    
         
+torch.save(valid_loss_store, loc+'mnist_validation_loss.pt')
+torch.save(valid_acc_store, loc+'mnist_validation_accuracy.pt')
+torch.save(test_loss_store, loc+'mnist_test_loss.pt')
+torch.save(test_acc_store, loc+'mnist_test_accuracy.pt')
+
 fig = plt.figure(figsize=(10,8))
 ax = fig.gca(projection='3d')
 ax.scatter(xs=test_acc_store[:,1], ys=test_acc_store[:,0], \
-                zs=test_acc_store[:,2], cmap=plt.cm.viridis, linewidth=0.2)
+                zs=test_acc_store[:,2], cmap = cm.coolwarm, s=30, c=test_acc_store[:,2])
 ax.set_xlabel('BatchSize')
 ax.set_ylabel('LearningRate')
 ax.set_zlabel('Accuracy')
