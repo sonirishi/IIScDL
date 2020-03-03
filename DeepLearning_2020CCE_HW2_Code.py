@@ -38,7 +38,7 @@ class read_data:
     
     def preparedata(self,location,filename,split,bs,*args):
         self._load_data(location,filename)
-        self.X = torch.reshape(self.X,(self.X.size()[0],self.X.size()[1]*self.X.size()[2]))
+        self.X = torch.reshape(self.X,(self.X.size(0),self.X.size(1)*self.X.size(2)))
         if split == True:
             x_train = self.X[0:args[0]]/255
             yt = self.Y[0:args[0]]
@@ -70,7 +70,8 @@ class LogisticRegression():
         self.bias = nn.init.uniform_(self.bias,-std,std)
         
     def _softmax(self,input_tensor):
-        out = torch.exp(input_tensor)/torch.sum(torch.exp(input_tensor),dim=1,keepdim=True)
+        out = \
+        torch.exp(input_tensor)/torch.sum(torch.exp(input_tensor),dim=1,keepdim=True)
         return out
     
     def lossfunc(self,output_tensor,predicted):
