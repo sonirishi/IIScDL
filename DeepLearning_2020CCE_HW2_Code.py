@@ -14,7 +14,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from math import sqrt
 
-torch.manual_seed(202)
+torch.manual_seed(1988)
 
 ## Dataset is abstract class
 
@@ -73,9 +73,8 @@ class LogisticRegression():
         out = torch.exp(input_tensor)/torch.sum(torch.exp(input_tensor),dim=1,keepdim=True)
         return out
     
-    def lossfunc(self,input_tensor,output_tensor):
-        out = self._softmax(input_tensor)
-        loss = -torch.sum(output_tensor*torch.log(out))
+    def lossfunc(self,output_tensor,predicted):
+        loss = -torch.sum(output_tensor*torch.log(predicted))
         return loss
     
     def forward(self,input_tensor):
@@ -126,7 +125,7 @@ test_loader = test.preparedata('E:/Documents/DLIISC/','test.pt',False,batchsize)
 
 model = LogisticRegression(784,10)
 
-epochs = 2
+epochs = 10
 
 # =============================================================================
 # p = iter(train_loader)
@@ -153,15 +152,15 @@ for i in range(epochs):
         model.backward(X,Y)
         model.sgd(learning_rate=learn_rate)
     for k, (VX,VY) in enumerate(valid_loader):    
-        out = model.predict(VX)
-        loss_valid[i] += model.lossfunc(out,VY)
+        outv = model.predict(VX)
+        loss_valid[i] += model.lossfunc(VY,outv)
     loss_valid[i] =  loss_valid[i]/len(valid_loader.dataset)
 
 loss_test = 0
 
 for k, (TX,TY) in enumerate(test_loader):    
-    out = model.predict(TX)
-    loss_test += model.lossfunc(out,TY)
+    outt = model.predict(TX)
+    loss_test += model.lossfunc(TY,outt)
 loss_test =  loss_test/len(test_loader.dataset)
             
         
