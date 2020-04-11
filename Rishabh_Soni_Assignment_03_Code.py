@@ -1,9 +1,10 @@
 
 """ 
 The code uses already downloaded IRIS data for building a classification model. 
-One can implemented as many hidden layers. Almost all activations implemented
-Final layer activation can be softmax only.
-Optimizer available: ADAM, SGD, NESTEROV SGD, RMSPROP, ADAGRAD, ADAMAX
+One can implemented as many hidden layers. Almost all activation function implemented
+Final layer activation can be softmax only in current implementation. However we can add regression easily
+Optimizer available: ADAM, SGD, MOMENTUM SGD, RMSPROP, ADAGRAD, ADAMAX
+
 """
 
 import pandas as pd
@@ -274,7 +275,7 @@ class FeedForwardClassifier:
                     
                     self.mb0[i] = self.mb1[i]
                     self.vb0[i] = self.vb1[i]
-        elif kind.lower() == 'nesterov':
+        elif kind.lower() == 'momentum':
             if t == 1:
                 self.mw0 = defaultdict()
                 self.mw1 = defaultdict()
@@ -369,7 +370,7 @@ class FeedForwardClassifier:
                 
                 self.biaslist[i] = \
                 self.biaslist[i] - learning_rate*torch.div(self.mhatb1[i],(torch.sqrt(self.vhatb1[i])+1e-8))
-        elif kind.lower() == 'nesterov':
+        elif kind.lower() == 'momentum':
             t = kwargs['time']
             learning_rate = kwargs['learning_rate']
             beta = kwargs['beta']
@@ -468,7 +469,7 @@ def IRIS(location,filename,batchsize,lcnt,node_list,activation_list,\
             if optimizer == 'adam':
                 model.optimizer(kind=optimizer,time=t,learning_rate=params[0],beta1=params[1],beta2=params[2])
                 t += 1
-            elif optimizer == 'nesterov':
+            elif optimizer == 'momentum':
                 model.optimizer(kind=optimizer,time=t,learning_rate=params[0],beta=params[1])
                 t += 1
             elif optimizer == 'adagrad':
@@ -526,11 +527,16 @@ valid_acc_store = torch.zeros(len(grid_hyperparam),epochs+2,dtype=float)
 test_loss_store = torch.zeros(len(grid_hyperparam),epochs+2,dtype=float)
 test_acc_store = torch.zeros(len(grid_hyperparam),epochs+2,dtype=float)
 
+activation_layers = ['relu','relu','softmax']
+bias = [True,True,True]
+optimizer = 'adam'
+
+# [lr,0.9,0.999]
+
 for lr, batchsize in grid_hyperparam:
     print("Iteration {} Start".format(counter))
     model, ltr, atr, lv, av, lt, at = \
-    IRIS(location,filename,batchsize,3,[4,10,10,3],['gelu','gelu','softmax'],[True,True,True],\
-         'adam',[lr,0.9,0.999],epochs,seed)
+    IRIS(location,filename,batchsize,3,[4,10,10,3],activation_layers,bias,optimizer,[lr,0.9,0.999],epochs,seed)
     ## Store train accuracy and loss after each epoch
     train_loss_store[counter,0] = lr
     train_loss_store[counter,1] = batchsize
